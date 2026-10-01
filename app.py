@@ -22,7 +22,7 @@ with app.app_context():
 @app.route("/")
 def index() -> str:
     """Strona główna: nazwa projektu i powitanie."""
-    return render_template("index.html", project="Sklep 4TP", user_name="Jan Kowalski")
+    return render_template("index.html", project="Sklep 4A", user_name="Pavlo Kavkovskyi")
 
 
 @app.route("/about-us")
@@ -52,7 +52,7 @@ def admin() -> tuple[str, int]:
 @app.route("/api/info")
 def api_info() -> dict[str, str]:
     """Informacje o aplikacji jako JSON (Flask zamienia słownik na JSON)."""
-    return {"name": "flask-shop", "author": "Jan Kowalski", "version": "0.1"}
+    return {"name": "flask-shop", "author": "Pavlo Kavkovskyi", "version": "0.1"}
 
 
 @app.route("/hello/<name>")

@@ -108,7 +108,7 @@ To błąd składni wykryty, zanim kod ruszył, więc debugger w przeglądarce si
 
 ## Autor
 
-Jan Kowalski, 4TP
+Pavlo Kavkovskyi 4A
 
 ## Kody odpowiedzi HTTP (zadanie 4, materiał 08)
 
