@@ -2,22 +2,23 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>{% block tytul %}Sklep 4TP{% endblock %}</title>
+    <title>{% block title %}Sklep 4TP{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <nav>
-        <a href="{{ url_for('lista') }}">Start</a> |
-        <a href="{{ url_for('dodaj') }}">Dodaj</a>
-        <form method="get" action="{{ url_for('lista') }}" class="szukaj">
+        <a href="{{ url_for('index') }}">Start</a> |
+        <a href="{{ url_for('product_list') }}">Produkty</a> |
+        <a href="{{ url_for('product_add') }}">Dodaj</a>
+        <form method="get" action="{{ url_for('product_list') }}" class="search">
             <input name="q" placeholder="Szukaj..." value="{{ q or '' }}">
-            <label><input type="checkbox" name="tylko_dostepne" value="1"
-                {% if tylko_dostepne %}checked{% endif %}> tylko dostępne</label>
+            <label><input type="checkbox" name="only_available" value="1"
+                {% if only_available %}checked{% endif %}> tylko dostępne</label>
             <button>Szukaj</button>
         </form>
     </nav>
     <main>
-        {% block tresc %}{% endblock %}
+        {% block content %}{% endblock %}
     </main>
     <footer>4TP 2026</footer>
 </body>

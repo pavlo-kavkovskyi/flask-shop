@@ -2,25 +2,28 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+VAT_RATE = 0.23
+VAT_MULTIPLIER = 1 + VAT_RATE
 
-class Kategoria(db.Model):
+
+class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nazwa = db.Column(db.String(50), nullable=False, unique=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
 
     def __repr__(self):
-        return f"<Kategoria {self.nazwa}>"
+        return f"<Category {self.name}>"
 
 
-class Produkt(db.Model):
+class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nazwa = db.Column(db.String(100), nullable=False)
-    cena = db.Column(db.Float, nullable=False)
-    dostepny = db.Column(db.Boolean, default=True)
-    kategoria_id = db.Column(db.Integer, db.ForeignKey("kategoria.id"))
-    kategoria = db.relationship("Kategoria", backref="produkty")
+    name = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    is_available = db.Column(db.Boolean, default=True)
+    category_id = db.Column(db.Integer, db.ForeignKey("category.id"))
+    category = db.relationship("Category", backref="products")
 
-    def cena_brutto(self):
-        return round(self.cena * 1.23, 2)
+    def gross_price(self):
+        return round(self.price * VAT_MULTIPLIER, 2)
 
     def __repr__(self):
-        return f"<Produkt {self.nazwa}>"
+        return f"<Product {self.name}>"

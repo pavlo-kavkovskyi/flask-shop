@@ -1,39 +1,38 @@
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, abort, redirect, render_template, request, url_for
 
-from models import Kategoria, Produkt, db
+from models import Category, Product, db
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///sklep.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///shop.db"
 db.init_app(app)
-
 
 with app.app_context():
     db.create_all()
-    if not Kategoria.query.first():
+    if not Category.query.first():
         db.session.add_all(
-            [Kategoria(nazwa=n) for n in ("laptopy", "akcesoria", "monitory", "inne")]
+            [Category(name=n) for n in ("laptopy", "akcesoria", "monitory", "inne")]
         )
         db.session.commit()
 
 
-# ---------- Trasy z materiałów 04-05 ----------
-@app.route("/witaj")
+# ---------- Routes from materials 04-05 ----------
+@app.route("/")
 def index():
-    return render_template("index.html", projekt="Sklep 4TP", imie="Jan Kowalski")
+    return render_template("index.html", project="Sklep 4TP", user_name="Jan Kowalski")
 
 
-@app.route("/o-nas")
-def o_nas():
+@app.route("/about-us")
+def about_us():
     return "Jesteśmy klasą 4 Technik Programista. Robimy sklep internetowy."
 
 
-@app.route("/kontakt")
-def kontakt():
+@app.route("/contact")
+def contact():
     return "Napisz: sklep@example.com"
 
 
-@app.route("/regulamin")
-def regulamin():
+@app.route("/terms")
+def terms():
     return "Regulamin sklepu: kupujesz, płacisz, odbierasz. Zwrot w 14 dni."
 
 
@@ -44,48 +43,48 @@ def admin():
 
 @app.route("/api/info")
 def api_info():
-    return {"nazwa": "flask-shop", "autor": "Jan Kowalski", "wersja": "0.1"}
+    return {"name": "flask-shop", "author": "Jan Kowalski", "version": "0.1"}
 
 
-@app.route("/czesc/<imie>")
-def czesc(imie):
-    return f"Cześć, {imie}!"
+@app.route("/hello/<name>")
+def hello(name):
+    return f"Cześć, {name}!"
 
 
-@app.route("/czesc/<imie>/<int:wiek>")
-def czesc_wiek(imie, wiek):
-    return f"Cześć, {imie}, masz {wiek} lat"
+@app.route("/hello/<name>/<int:age>")
+def hello_age(name, age):
+    return f"Cześć, {name}, masz {age} lat"
 
 
-@app.route("/dodaj/<int:a>/<int:b>")
-def dodaj_liczby(a, b):
+@app.route("/add/<int:a>/<int:b>")
+def add_numbers(a, b):
     return f"{a} + {b} = {a + b}"
 
 
-@app.route("/odejmij/<int:a>/<int:b>")
-def odejmij(a, b):
+@app.route("/subtract/<int:a>/<int:b>")
+def subtract(a, b):
     return f"{a} - {b} = {a - b}"
 
 
-@app.route("/pomnoz/<int:a>/<int:b>")
-def pomnoz(a, b):
+@app.route("/multiply/<int:a>/<int:b>")
+def multiply(a, b):
     return f"{a} * {b} = {a * b}"
 
 
-@app.route("/podziel/<int:a>/<int:b>")
-def podziel(a, b):
+@app.route("/divide/<int:a>/<int:b>")
+def divide(a, b):
     if b == 0:
         return "Nie dzielimy przez zero", 400
     return f"{a} / {b} = {a / b}"
 
 
-@app.route("/potega/<int:a>/<int:b>")
-def potega(a, b):
+@app.route("/power/<int:a>/<int:b>")
+def power(a, b):
     return f"{a} ^ {b} = {a**b}"
 
 
-@app.route("/tabliczka/<int:n>")
-def tabliczka(n):
+@app.route("/multiplication-table/<int:n>")
+def multiplication_table(n):
     if not 1 <= n <= 20:
         return "n musi być z przedziału 1-20", 400
     return "<br>".join(f"{n} x {i} = {n * i}" for i in range(1, 11))
@@ -93,65 +92,82 @@ def tabliczka(n):
 
 @app.route("/start")
 def start():
-    return redirect(url_for("lista"))
+    return redirect(url_for("product_list"))
 
 
-# ---------- Materiał 07: CRUD na bazie ----------
-@app.route("/")
-def lista():
+# ---------- Material 07: CRUD ----------
+def read_product_form():
+    """Czyta pola formularza; przy złych danych kończy żądaniem 400."""
+    try:
+        name = request.form["name"].strip()
+        price = float(request.form["price"].replace(",", "."))
+        category_id = int(request.form["category_id"])
+    except (KeyError, ValueError):
+        abort(400)
+    if not name or price < 0:
+        abort(400)
+    return name, price, category_id, "is_available" in request.form
+
+
+@app.route("/products")
+def product_list():
     q = request.args.get("q", "").strip()
-    tylko_dostepne = request.args.get("tylko_dostepne") == "1"
-    zapytanie = Produkt.query
-    if tylko_dostepne:
-        zapytanie = zapytanie.filter_by(dostepny=True)
+    only_available = request.args.get("only_available") == "1"
+    query = Product.query
+    if only_available:
+        query = query.filter_by(is_available=True)
     if q:
-        zapytanie = zapytanie.filter(Produkt.nazwa.contains(q))
-    produkty = zapytanie.order_by(Produkt.nazwa).all()
+        query = query.filter(Product.name.contains(q))
+    products = query.order_by(Product.name).all()
     return render_template(
-        "lista.html", produkty=produkty, q=q, tylko_dostepne=tylko_dostepne
+        "products/list.html", products=products, q=q, only_available=only_available
     )
 
 
-@app.route("/element/<int:id>")
-def szczegoly(id):
-    p = Produkt.query.get_or_404(id)
-    return render_template("element.html", p=p)
-
-
-@app.route("/dodaj", methods=["GET", "POST"])
-def dodaj():
+@app.route("/products/add", methods=["GET", "POST"])
+def product_add():
     if request.method == "POST":
-        p = Produkt(
-            nazwa=request.form["nazwa"],
-            cena=float(request.form["cena"]),
-            kategoria_id=int(request.form["kategoria_id"]),
-            dostepny="dostepny" in request.form,
+        name, price, category_id, is_available = read_product_form()
+        product = Product(
+            name=name, price=price, category_id=category_id, is_available=is_available
         )
-        db.session.add(p)
+        db.session.add(product)
         db.session.commit()
-        return redirect(url_for("lista"))
-    return render_template("dodaj.html", kategorie=Kategoria.query.all())
+        return redirect(url_for("product_list"))
+    return render_template(
+        "products/form.html", product=None, categories=Category.query.all()
+    )
 
 
-@app.route("/edytuj/<int:id>", methods=["GET", "POST"])
-def edytuj(id):
-    p = Produkt.query.get_or_404(id)
+@app.route("/products/<int:product_id>")
+def product_detail(product_id):
+    product = Product.query.get_or_404(product_id)
+    return render_template("products/detail.html", product=product)
+
+
+@app.route("/products/<int:product_id>/edit", methods=["GET", "POST"])
+def product_edit(product_id):
+    product = Product.query.get_or_404(product_id)
     if request.method == "POST":
-        p.nazwa = request.form["nazwa"]
-        p.cena = float(request.form["cena"])
-        p.kategoria_id = int(request.form["kategoria_id"])
-        p.dostepny = "dostepny" in request.form
+        (
+            product.name,
+            product.price,
+            product.category_id,
+            product.is_available,
+        ) = read_product_form()
         db.session.commit()
-        return redirect(url_for("szczegoly", id=p.id))
-    return render_template("edytuj.html", p=p, kategorie=Kategoria.query.all())
+        return redirect(url_for("product_detail", product_id=product.id))
+    return render_template(
+        "products/form.html", product=product, categories=Category.query.all()
+    )
 
 
-@app.route("/usun/<int:id>", methods=["POST"])
-def usun(id):
-    p = Produkt.query.get_or_404(id)
-    db.session.delete(p)
+@app.route("/products/<int:product_id>/delete", methods=["POST"])
+def product_delete(product_id):
+    product = Product.query.get_or_404(product_id)
+    db.session.delete(product)
     db.session.commit()
-    return redirect(url_for("lista"))
+    return redirect(url_for("product_list"))
 
 
 if __name__ == "__main__":

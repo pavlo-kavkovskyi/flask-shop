@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} – Sklep 4TP{% endblock %}
+{% block content %}
+<h1>{{ product.name }}</h1>
+<p>Cena netto: {{ product.price }} zł</p>
+<p>Cena brutto: {{ product.gross_price() }} zł</p>
+<p>Kategoria: {{ product.category.name if product.category else 'brak' }}</p>
+<p>Dostępny: {{ "tak" if product.is_available else "nie" }}</p>
+<a href="{{ url_for('product_edit', product_id=product.id) }}">Edytuj</a> |
+<a href="{{ url_for('product_list') }}">Wróć</a>
+{% endblock %}
