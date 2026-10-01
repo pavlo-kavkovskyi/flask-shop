@@ -126,3 +126,18 @@ wysyłają GET bez pytania – link `<a href="/usun/5">` mógłby wtedy skasowa�
 ruff check .   – znalazł: (wpisz liczbę i rodzaje problemów)
 ruff format .  – (wpisz, czy coś zmienił)
 ```
+
+## Definition of Done
+
+- [ ] Aplikacja uruchamia się z czystego klonu: `pip install -r requirements.txt`, `python app.py` *(do sprawdzenia na czystym klonie)*
+- [x] Nazwy zmiennych, funkcji, klas, tras – po angielsku, zgodnie z PEP 8
+- [ ] `ruff check .` nie zgłasza błędów, `ruff format .` nic nie zmienia *(do uruchomienia lokalnie)*
+- [x] Każda funkcja widoku i każdy model ma docstring
+- [x] Nowe funkcje mają type hints
+- [x] Żaden GET nie zmienia danych (usuwanie, dodawanie = POST)
+- [x] Po każdym POST jest redirect
+- [x] Nieistniejący zasób daje 404, złe dane 400 – nie 500
+- [x] `.gitignore` obejmuje `venv/`, `instance/`, `*.db`, `__pycache__/`, `.env`
+- [x] README: co to, jak uruchomić, struktura, tabela tras
+- [x] Commity małe, po angielsku, według konwencji
+- [ ] Umiesz wyjaśnić każdą linię – także tę, którą napisał LLM *(Twoja odpowiedzialność)*
