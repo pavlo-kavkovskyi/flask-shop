@@ -26,6 +26,35 @@ Aplikacja: http://localhost:5000
 | `/elementy` | lista wszystkich elementów |
 | `/start` | redirect 302 na `/` |
 
+## Struktura folderów
+
+```text
+flask-shop/
+├── app.py            <- trasy (kontrolery) i dane tymczasowe
+├── templates/        <- szablony Jinja2
+│   ├── base.html     <- szablon bazowy (menu, wyszukiwarka, stopka)
+│   ├── index.html
+│   ├── lista.html
+│   ├── element.html
+│   ├── szukaj.html
+│   └── dodaj.html
+├── static/
+│   └── style.css
+├── mvc.md
+├── requirements.txt
+└── README.md
+```
+
+## Trasy (materiał 06)
+
+| Metoda | Adres | Opis |
+|--------|-------|------|
+| GET | `/` | strona główna (szablon z `projekt` i `imie`) |
+| GET | `/lista` | tabela produktów, niedostępne wyróżnione; pusta lista → komunikat |
+| GET | `/element/<id>` | szczegóły; brak id → 404 |
+| GET | `/szukaj?q=` | wyszukiwarka po nazwie, liczba wyników |
+| GET/POST | `/dodaj` | formularz dodawania; po POST redirect (302) na `/lista` |
+
 ## Zepsuj i napraw (zadanie 6, materiał 04)
 
 Celowa literówka `retrun` zamiast `return`. Python nie uruchomił aplikacji

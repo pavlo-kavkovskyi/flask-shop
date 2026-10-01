@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block tytul %}Lista – Sklep 4TP{% endblock %}
+{% block tresc %}
+<h1>Produkty ({{ produkty|length }})</h1>
+
+{% if produkty %}
+<table>
+    <tr><th>#</th><th>Nazwa</th><th>Cena</th><th>Kategoria</th><th>Status</th></tr>
+    {% for p in produkty %}
+    <tr{% if not p.dostepny %} class="niedostepny"{% endif %}>
+        <td>{{ loop.index }}</td>
+        <td><a href="{{ url_for('element', id=p.id) }}">{{ p.nazwa }}</a></td>
+        <td>{{ p.cena }} zł</td>
+        <td>{{ p.kategoria }}</td>
+        <td>{% if p.dostepny %}dostępny{% else %}<b>niedostępny</b>{% endif %}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Brak elementów. <a href="{{ url_for('dodaj') }}">Dodaj pierwszy</a>.</p>
+{% endif %}
+{% endblock %}

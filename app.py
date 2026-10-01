@@ -1,20 +1,20 @@
-from flask import Flask, abort, redirect, request, url_for
+from flask import Flask, abort, redirect, render_template, request, url_for
 
 app = Flask(__name__)
 
-# Mini-baza w słowniku (zadanie 5) – zalążek modelu
-PRODUKTY = {
-    1: "Laptop",
-    2: "Mysz",
-    3: "Klawiatura",
-    4: "Monitor",
-    5: "Słuchawki",
-}
+# Dane tymczasowo w pamięci (lista słowników) – zalążek modelu
+PRODUKTY = [
+    {"id": 1, "nazwa": "Laptop", "cena": 2999.0, "kategoria": "laptopy", "dostepny": True},
+    {"id": 2, "nazwa": "Mysz", "cena": 49.0, "kategoria": "akcesoria", "dostepny": False},
+    {"id": 3, "nazwa": "Klawiatura", "cena": 199.0, "kategoria": "akcesoria", "dostepny": True},
+    {"id": 4, "nazwa": "Monitor", "cena": 899.0, "kategoria": "monitory", "dostepny": True},
+    {"id": 5, "nazwa": "Słuchawki", "cena": 149.0, "kategoria": "akcesoria", "dostepny": False},
+]
 
 
 @app.route("/")
 def index():
-    return "Hello World! Tu Jan Kowalski, sklep 4TP."
+    return render_template("index.html", projekt="Sklep 4TP", imie="Jan Kowalski")
 
 
 @app.route("/o-nas")
@@ -100,23 +100,56 @@ def produkty():
     return f"Kategoria: {kat or 'wszystkie'}, sortowanie: {sort or 'domyślne'}"
 
 
-# --- Zadanie 5: mini-baza w słowniku ---
+# --- Mini-baza (materiał 05) i szczegóły w szablonie (materiał 06) ---
+def znajdz_produkt(id):
+    return next((p for p in PRODUKTY if p["id"] == id), None)
+
+
 @app.route("/element/<int:id>")
 def element(id):
-    if id not in PRODUKTY:
+    p = znajdz_produkt(id)
+    if p is None:
         abort(404)
-    return f"Produkt: {PRODUKTY[id]}"
+    return render_template("element.html", p=p)
 
 
 @app.route("/elementy")
 def elementy():
-    return "<br>".join(f"{i}. {nazwa}" for i, nazwa in PRODUKTY.items())
+    return "<br>".join(f"{p['id']}. {p['nazwa']}" for p in PRODUKTY)
 
 
 # --- Zadanie 6: przekierowanie ---
 @app.route("/start")
 def start():
     return redirect(url_for("index"))
+
+
+# --- Materiał 06: lista, szukaj, dodaj ---
+@app.route("/lista")
+def lista():
+    return render_template("lista.html", produkty=PRODUKTY)
+
+
+@app.route("/szukaj")
+def szukaj():
+    q = request.args.get("q", "")
+    wyniki = [p for p in PRODUKTY if q.lower() in p["nazwa"].lower()]
+    return render_template("szukaj.html", q=q, wyniki=wyniki)
+
+
+@app.route("/dodaj", methods=["GET", "POST"])
+def dodaj():
+    if request.method == "POST":
+        nowy = {
+            "id": max((p["id"] for p in PRODUKTY), default=0) + 1,
+            "nazwa": request.form["nazwa"],
+            "cena": float(request.form["cena"]),
+            "kategoria": "inne",
+            "dostepny": True,
+        }
+        PRODUKTY.append(nowy)
+        return redirect(url_for("lista"))
+    return render_template("dodaj.html")
 
 
 if __name__ == "__main__":

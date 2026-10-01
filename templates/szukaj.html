@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block tytul %}Szukaj – Sklep 4TP{% endblock %}
+{% block tresc %}
+<h1>Wyniki dla „{{ q }}” ({{ wyniki|length }})</h1>
+{% if wyniki %}
+<ul>
+    {% for p in wyniki %}
+    <li><a href="{{ url_for('element', id=p.id) }}">{{ p.nazwa }}</a> – {{ p.cena }} zł</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Brak wyników dla zapytania „{{ q }}”.</p>
+{% endif %}
+{% endblock %}
