@@ -56,6 +56,19 @@ mvc.md            – notatki MVC/MTV
 | GET/POST | `/products/<id>/edit` | edycja; po POST redirect na szczegóły | 200, 302, 400, 404 |
 | POST | `/products/<id>/delete` | usuwanie; po POST redirect | 302, 404, 405 (GET) |
 
+## Status
+
+- [x] model `Product` i `Category`
+- [x] lista, szczegóły, dodawanie
+- [x] edycja
+- [x] wyszukiwarka i filtr „tylko dostępne”
+- [ ] testy automatyczne
+
+## Dokumentacja
+
+- [Notatki o HTTP](docs/notes-http.md)
+- [Notatki MVC/MTV](mvc.md)
+
 ## Test CRUD
 
 Komendy do wykonania w `flask shell` (venv aktywny). Przebieg sesji wklej poniżej:
