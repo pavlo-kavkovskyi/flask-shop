@@ -96,3 +96,33 @@ To błąd składni wykryty, zanim kod ruszył, więc debugger w przeglądarce si
 ## Autor
 
 Jan Kowalski, 4TP
+
+## Kody odpowiedzi HTTP (zadanie 4, materiał 08)
+
+Tabela adres → metoda → kod. Wartości sprawdź w F12 → Network.
+
+| Adres | Metoda | Kod | Dlaczego |
+|-------|--------|-----|----------|
+| `/products` | GET | 200 | działająca strona |
+| `/start` | GET | 302 | `redirect()` na `/products` (potem drugie żądanie 200) |
+| `/products/999` | GET | 404 | `get_or_404` – nie ma takiego produktu |
+| `/about-us` | POST | 405 | trasa istnieje, ale bez `methods=["POST"]` |
+| `/divide/7/0` | GET | 400 | dzielenie przez zero – złe żądanie |
+| `/admin` | GET | 403 | zwracamy 403 celowo |
+| `/boom` (tymczasowa trasa z `1 / 0`) | GET | 500 | wyjątek w kodzie serwera – po sprawdzeniu trasę usuń |
+
+Dla 500 dopisz na chwilę trasę `@app.route("/boom")` z `return str(1 / 0)`, odśwież, zobacz
+traceback, potem ją usuń (naprawa = usunięcie błędnego kodu).
+
+## Bezpieczny GET (zadanie 5)
+
+W projekcie żaden GET nie zmienia danych: dodawanie, edycja i usuwanie idą przez POST.
+To ważne, bo roboty indeksujące, podglądy linków w komunikatorach i prefetch przeglądarki
+wysyłają GET bez pytania – link `<a href="/usun/5">` mógłby wtedy skasować produkt.
+
+## Ruff (zadanie 2)
+
+```text
+ruff check .   – znalazł: (wpisz liczbę i rodzaje problemów)
+ruff format .  – (wpisz, czy coś zmienił)
+```
