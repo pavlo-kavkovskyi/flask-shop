@@ -5,18 +5,24 @@
 
 {% if produkty %}
 <table>
-    <tr><th>#</th><th>Nazwa</th><th>Cena</th><th>Kategoria</th><th>Status</th></tr>
+    <tr><th>#</th><th>Nazwa</th><th>Cena</th><th>Brutto</th><th>Status</th><th></th></tr>
     {% for p in produkty %}
     <tr{% if not p.dostepny %} class="niedostepny"{% endif %}>
         <td>{{ loop.index }}</td>
-        <td><a href="{{ url_for('element', id=p.id) }}">{{ p.nazwa }}</a></td>
+        <td><a href="{{ url_for('szczegoly', id=p.id) }}">{{ p.nazwa }}</a></td>
         <td>{{ p.cena }} zł</td>
-        <td>{{ p.kategoria }}</td>
+        <td>{{ p.cena_brutto() }} zł</td>
         <td>{% if p.dostepny %}dostępny{% else %}<b>niedostępny</b>{% endif %}</td>
+        <td>
+            <a href="{{ url_for('edytuj', id=p.id) }}">Edytuj</a>
+            <form method="post" action="{{ url_for('usun', id=p.id) }}" style="display:inline">
+                <button>Usuń</button>
+            </form>
+        </td>
     </tr>
     {% endfor %}
 </table>
 {% else %}
-<p>Brak elementów. <a href="{{ url_for('dodaj') }}">Dodaj pierwszy</a>.</p>
+<p>Brak produktów. <a href="{{ url_for('dodaj') }}">Dodaj pierwszy</a>.</p>
 {% endif %}
 {% endblock %}

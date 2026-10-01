@@ -7,11 +7,12 @@
 </head>
 <body>
     <nav>
-        <a href="{{ url_for('index') }}">Start</a> |
-        <a href="{{ url_for('lista') }}">Lista</a> |
+        <a href="{{ url_for('lista') }}">Start</a> |
         <a href="{{ url_for('dodaj') }}">Dodaj</a>
-        <form method="get" action="{{ url_for('szukaj') }}" class="szukaj">
+        <form method="get" action="{{ url_for('lista') }}" class="szukaj">
             <input name="q" placeholder="Szukaj..." value="{{ q or '' }}">
+            <label><input type="checkbox" name="tylko_dostepne" value="1"
+                {% if tylko_dostepne %}checked{% endif %}> tylko dostępne</label>
             <button>Szukaj</button>
         </form>
     </nav>

@@ -2,8 +2,10 @@
 {% block tytul %}{{ p.nazwa }} – Sklep 4TP{% endblock %}
 {% block tresc %}
 <h1>{{ p.nazwa }}</h1>
-<p>Cena: {{ p.cena }} zł</p>
+<p>Cena netto: {{ p.cena }} zł</p>
+<p>Cena brutto: {{ p.cena_brutto() }} zł</p>
 <p>Kategoria: {{ p.kategoria }}</p>
 <p>Dostępny: {{ "tak" if p.dostepny else "nie" }}</p>
+<a href="{{ url_for('edytuj', id=p.id) }}">Edytuj</a> |
 <a href="{{ url_for('lista') }}">Wróć</a>
 {% endblock %}

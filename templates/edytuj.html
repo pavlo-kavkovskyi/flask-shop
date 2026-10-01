@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block tytul %}Edytuj {{ p.nazwa }} – Sklep 4TP{% endblock %}
+{% block tresc %}
+<h1>Edytuj: {{ p.nazwa }}</h1>
+<form method="post">
+    <label>Nazwa: <input name="nazwa" value="{{ p.nazwa }}" required></label><br>
+    <label>Cena: <input name="cena" type="number" step="0.01" value="{{ p.cena }}" required></label><br>
+    <label>Kategoria: <input name="kategoria" value="{{ p.kategoria }}"></label><br>
+    <label><input type="checkbox" name="dostepny" {% if p.dostepny %}checked{% endif %}> Dostępny</label><br>
+    <button>Zapisz</button>
+</form>
+{% endblock %}
