@@ -30,20 +30,23 @@ Aplikacja: http://localhost:5000
 
 ```text
 flask-shop/
-├── app.py            <- trasy (kontrolery) i dane tymczasowe
-├── templates/        <- szablony Jinja2
-│   ├── base.html     <- szablon bazowy (menu, wyszukiwarka, stopka)
-│   ├── index.html
-│   ├── lista.html
-│   ├── element.html
-│   ├── szukaj.html
-│   └── dodaj.html
-├── static/
-│   └── style.css
+├── app.py            <- konfiguracja + kontrolery (trasy)
+├── models.py         <- modele SQLAlchemy (Produkt, Kategoria)
+├── templates/        <- szablony Jinja2 (widoki)
+├── static/           <- style.css
+├── instance/sklep.db <- baza SQLite (poza repozytorium)
 ├── mvc.md
 ├── requirements.txt
 └── README.md
 ```
+
+## Warstwy MVC → pliki
+
+| Warstwa MVC | U nas | Plik |
+|-------------|-------|------|
+| Model | klasy `db.Model` + metody z logiką (`cena_brutto`) | `models.py` |
+| View | szablony Jinja2 | `templates/*.html` |
+| Controller | funkcje z `@app.route` | `app.py` |
 
 ## Trasy (materiał 06)
 
@@ -54,6 +57,38 @@ flask-shop/
 | GET | `/element/<id>` | szczegóły; brak id → 404 |
 | GET | `/szukaj?q=` | wyszukiwarka po nazwie, liczba wyników |
 | GET/POST | `/dodaj` | formularz dodawania; po POST redirect (302) na `/lista` |
+
+## Trasy (materiał 07 – baza danych)
+
+| Metoda | Adres | Opis |
+|--------|-------|------|
+| GET | `/` | lista z bazy, posortowana po nazwie; `?q=` szuka, `?tylko_dostepne=1` filtruje |
+| GET | `/element/<id>` | szczegóły; brak → 404 (`get_or_404`) |
+| GET/POST | `/dodaj` | dodawanie, po POST redirect |
+| GET/POST | `/edytuj/<id>` | edycja, po POST redirect na szczegóły |
+| POST | `/usun/<id>` | usuwanie (POST, nie link GET), po POST redirect |
+
+## Test CRUD
+
+Komendy do wykonania w `flask shell` (venv aktywny). Przebieg sesji wklej poniżej:
+
+```python
+from models import db, Produkt, Kategoria
+k = Kategoria.query.first()
+db.session.add_all([Produkt(nazwa="Laptop", cena=2999.99, kategoria=k),
+                    Produkt(nazwa="Mysz", cena=49, kategoria=k),
+                    Produkt(nazwa="Monitor", cena=899, kategoria=k)])
+db.session.commit()
+Produkt.query.all()                       # read
+p = Produkt.query.get(1); p.cena = 2799   # update
+db.session.commit()
+db.session.delete(Produkt.query.get(2))   # delete
+db.session.commit()
+```
+
+```text
+(tu wklej wynik z własnego terminala)
+```
 
 ## Zepsuj i napraw (zadanie 6, materiał 04)
 

@@ -1,27 +1,19 @@
-from flask import Flask, abort, redirect, render_template, request, url_for
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, redirect, render_template, request, url_for
+
+from models import Kategoria, Produkt, db
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///sklep.db"
-db = SQLAlchemy(app)
-
-
-class Produkt(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nazwa = db.Column(db.String(100), nullable=False)
-    cena = db.Column(db.Float, nullable=False)
-    kategoria = db.Column(db.String(50), default="inne")
-    dostepny = db.Column(db.Boolean, default=True)
-
-    def cena_brutto(self):
-        return round(self.cena * 1.23, 2)
-
-    def __repr__(self):
-        return f"<Produkt {self.nazwa}>"
+db.init_app(app)
 
 
 with app.app_context():
     db.create_all()
+    if not Kategoria.query.first():
+        db.session.add_all(
+            [Kategoria(nazwa=n) for n in ("laptopy", "akcesoria", "monitory", "inne")]
+        )
+        db.session.commit()
 
 
 # ---------- Trasy z materiałów 04-05 ----------
@@ -132,13 +124,13 @@ def dodaj():
         p = Produkt(
             nazwa=request.form["nazwa"],
             cena=float(request.form["cena"]),
-            kategoria=request.form.get("kategoria", "inne"),
+            kategoria_id=int(request.form["kategoria_id"]),
             dostepny="dostepny" in request.form,
         )
         db.session.add(p)
         db.session.commit()
         return redirect(url_for("lista"))
-    return render_template("dodaj.html")
+    return render_template("dodaj.html", kategorie=Kategoria.query.all())
 
 
 @app.route("/edytuj/<int:id>", methods=["GET", "POST"])
@@ -147,11 +139,11 @@ def edytuj(id):
     if request.method == "POST":
         p.nazwa = request.form["nazwa"]
         p.cena = float(request.form["cena"])
-        p.kategoria = request.form.get("kategoria", "inne")
+        p.kategoria_id = int(request.form["kategoria_id"])
         p.dostepny = "dostepny" in request.form
         db.session.commit()
         return redirect(url_for("szczegoly", id=p.id))
-    return render_template("edytuj.html", p=p)
+    return render_template("edytuj.html", p=p, kategorie=Kategoria.query.all())
 
 
 @app.route("/usun/<int:id>", methods=["POST"])
